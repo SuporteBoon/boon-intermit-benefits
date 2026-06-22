@@ -1,5 +1,3 @@
-org: boonsaude
-app: boon-intermit-benefits
 service: boon-intermit-benefits
 
 package:
@@ -23,7 +21,7 @@ provider:
           - ${self:custom.clientId}
 
 custom:
-  userPoolId: us-east-1_d0MWOOQUB
+  userPoolId: us-east-1_d0MWO0QUB
   clientId: 6caav50hrviqc1eamamc54p7jv
 
 functions:
