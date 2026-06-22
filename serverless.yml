@@ -1,0 +1,54 @@
+org: boonsaude
+app: boon-intermit-benefits
+service: boon-intermit-benefits
+
+package:
+  individually: true
+  excludeDevDependencies: true
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  timeout: 10
+
+  httpApi:
+    authorizers:
+      cognitoM2M:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: https://cognito-idp.${self:provider.region}.amazonaws.com/${self:custom.userPoolId}
+        audience:
+          - ${self:custom.clientId}
+
+custom:
+  userPoolId: us-east-1_d0MWOOQUB
+  clientId: 6caav50hrviqc1eamamc54p7jv
+
+functions:
+  # Endpoint 1: Livre (Monitoramento)
+  healthCheck:
+    handler: src/handlers/public/health.handler
+    events:
+      - httpApi:
+          path: /health
+          method: get
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/public/health.js"
+
+  # Endpoint 2: Protegido pelo Cognito (Recepção do Contrato)
+  newContractWebhook:
+    handler: src/handlers/webhooks/new-contract.handler
+    events:
+      - httpApi:
+          path: /integration/new-contract
+          method: post
+          authorizer:
+            name: cognitoM2M
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/webhooks/new-contract.js"
