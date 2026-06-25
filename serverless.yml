@@ -49,4 +49,56 @@ functions:
     package:
       patterns:
         - "!**"
-        - "src/handlers/webhooks/new-contract.js"
+        - "src/handlers/webhooks/new-contract.js"  
+        
+  createEstipulante:
+    handler: src/handlers/public/estipulante/create.handler
+    events:
+      - httpApi:
+          path: /estipulante
+          method: post
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/public/estipulante/create.js"
+        - "src/classes/estipulante/estipulante.js"
+        - "src/infra/database/postgres.js"
+
+  getEstipulante:
+    handler: src/handlers/public/estipulante/get.handler
+    events:
+      - httpApi:
+          path: /estipulante/{id}
+          method: get
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/public/estipulante/get.js"
+        - "src/classes/estipulante/estipulante.js"
+        - "src/infra/database/postgres.js"
+
+  updateEstipulante:
+    handler: src/handlers/public/estipulante/update.handler
+    events:
+      - httpApi:
+          path: /estipulante/{id}
+          method: put
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/public/estipulante/update.js"
+        - "src/classes/estipulante/estipulante.js"
+        - "src/infra/database/postgres.js"
+
+  deleteEstipulante:
+    handler: src/handlers/public/estipulante/delete.handler
+    events:
+      - httpApi:
+          path: /estipulante/{id}
+          method: delete
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/public/estipulante/delete.js"
+        - "src/classes/estipulante/estipulante.js"
+        - "src/infra/database/postgres.js"
