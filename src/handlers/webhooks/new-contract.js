@@ -1,7 +1,6 @@
 'use strict';
 
-
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
 

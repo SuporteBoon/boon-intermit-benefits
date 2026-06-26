@@ -1,6 +1,4 @@
-'use strict';
-
-const { query } = require('../../infra/database/postgres.js');
+import { query } from '../../infra/database/postgres.js';
 
 const FILLABLE_FIELDS = [
   'grupo_economico_id',
@@ -31,7 +29,7 @@ const FILLABLE_FIELDS = [
   'usuario_cadastro_id'
 ];
 
-class Estipulante {
+export class Estipulante {
   async create(payload) {
     const fields = [];
     const values = [];
@@ -92,5 +90,3 @@ class Estipulante {
     return result.rows[0] || null;
   }
 }
-
-module.exports.Estipulante = Estipulante;

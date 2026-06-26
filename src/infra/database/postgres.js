@@ -1,6 +1,6 @@
-'use strict';
+import pkg from 'pg';
 
-const { Pool } = require('pg');
+const { Pool } = pkg;
 
 // O Pool deve ser criado fora do handler para ser reutilizado entre execuções da Lambda (Warm Start)
 const pool = new Pool({
@@ -17,4 +17,4 @@ const pool = new Pool({
   },
 });
 
-module.exports.query = (text, params) => pool.query(text, params);
+export const query = (text, params) => pool.query(text, params);

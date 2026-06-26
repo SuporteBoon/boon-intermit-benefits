@@ -1,6 +1,8 @@
 'use strict';
 
-exports.handler = async (event) => {
+import { Estipulante } from '../../../classes/estipulante/estipulante.js';
+
+export const handler = async (event) => {
   try {
     const id = event.pathParameters?.id;
     if (!id) {
@@ -11,7 +13,6 @@ exports.handler = async (event) => {
       };
     }
 
-    const { Estipulante } = require("../../../classes/estipulante/estipulante.js");
     const service = new Estipulante();
     const item = await service.delete(id);
 
