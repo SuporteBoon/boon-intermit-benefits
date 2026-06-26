@@ -24,6 +24,46 @@ custom:
   userPoolId: us-east-1_d0MWO0QUB
   clientId: 6caav50hrviqc1eamamc54p7jv
 
+vpc:
+  securityGroupIds:
+    - sg-0e71e696efc0e5408
+  subnetIds:
+    - subnet-04df8373224263947
+    - subnet-08c47a415c2dd886e
+
+  environment:
+    DB_HOST: "boon-rds-dev.c2j6koy8871l.us-east-1.rds.amazonaws.com"
+    DB_NAME: "boondb"
+    DB_SCHEMA: "sinergy"
+    DB_USER: "{{resolve:secretsmanager:/boon/${sls:stage}/rds/credentials:SecretString:username}}"
+    DB_PASSWORD: "{{resolve:secretsmanager:/boon/${sls:stage}/rds/credentials:SecretString:password}}"
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:CreateLogDelivery
+            - logs:GetLogDelivery
+            - logs:UpdateLogDelivery
+            - logs:DeleteLogDelivery
+            - logs:ListLogDeliveries
+            - logs:PutResourcePolicy
+            - logs:DescribeResourcePolicies
+            - logs:DescribeLogGroups
+            - ec2:CreateNetworkInterface
+            - ec2:DescribeNetworkInterfaces
+            - ec2:DeleteNetworkInterface
+          Resource: "*"
+
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource: "arn:aws:secretsmanager:us-east-1:*:secret:/boon/${sls:stage}/rds/*"
+
 functions:
   # Endpoint 1: Livre (Monitoramento)
   healthCheck:
@@ -49,8 +89,8 @@ functions:
     package:
       patterns:
         - "!**"
-        - "src/handlers/webhooks/new-contract.js"  
-        
+        - "src/handlers/webhooks/new-contract.js"
+
   createEstipulante:
     handler: src/handlers/public/estipulante/create.handler
     events:
