@@ -20,21 +20,17 @@ provider:
         audience:
           - ${self:custom.clientId}
 
-custom:
-  userPoolId: us-east-1_d0MWO0QUB
-  clientId: 6caav50hrviqc1eamamc54p7jv
-
-vpc:
-  securityGroupIds:
-    - sg-0e71e696efc0e5408
-  subnetIds:
-    - subnet-04df8373224263947
-    - subnet-08c47a415c2dd886e
+  vpc:
+    securityGroupIds:
+      - sg-0e71e696efc0e5408
+    subnetIds:
+      - subnet-04df8373224263947
+      - subnet-08c47a415c2dd886e
 
   environment:
-    DB_HOST: "boon-rds-dev.c2j6koy8871l.us-east-1.rds.amazonaws.com"
-    DB_NAME: "boondb"
-    DB_SCHEMA: "sinergy"
+    DB_HOST: boon-rds-dev.c2j6koy8871l.us-east-1.rds.amazonaws.com
+    DB_NAME: boondb
+    DB_SCHEMA: sinergy
     DB_USER: "{{resolve:secretsmanager:/boon/${sls:stage}/rds/credentials:SecretString:username}}"
     DB_PASSWORD: "{{resolve:secretsmanager:/boon/${sls:stage}/rds/credentials:SecretString:password}}"
 
@@ -64,8 +60,11 @@ vpc:
             - secretsmanager:GetSecretValue
           Resource: "arn:aws:secretsmanager:us-east-1:*:secret:/boon/${sls:stage}/rds/*"
 
+custom:
+  userPoolId: us-east-1_d0MWO0QUB
+  clientId: 6caav50hrviqc1eamamc54p7jv
+
 functions:
-  # Endpoint 1: Livre (Monitoramento)
   healthCheck:
     handler: src/handlers/public/health.handler
     events:
@@ -77,7 +76,6 @@ functions:
         - "!**"
         - "src/handlers/public/health.js"
 
-  # Endpoint 2: Protegido pelo Cognito (Recepção do Contrato)
   newContractWebhook:
     handler: src/handlers/webhooks/new-contract.handler
     events:

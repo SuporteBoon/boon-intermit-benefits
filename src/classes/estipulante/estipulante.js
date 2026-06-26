@@ -49,14 +49,15 @@ export class Estipulante {
       placeholders.push(`$${values.length}`);
     }
 
-    const text = `INSERT INTO tb_estipulante (${fields.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING *`;
+    const text = `INSERT INTO "intermit-benefits".tb_estipulante (${fields.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING *`;
     const result = await query(text, values);
 
-    return result.rows[0];
+    return result?.rows[0];
   }
 
   async getById(id) {
-    const result = await query(`SELECT * FROM tb_estipulante WHERE id = $1`, [id]);
+    const result = await query(`SELECT * FROM "intermit-benefits".tb_estipulante WHERE id = $1`, [id]);
+    console.log("Result from getById:", result.rows);
     return result.rows[0] || null;
   }
 
@@ -79,14 +80,14 @@ export class Estipulante {
     }
 
     values.push(id);
-    const text = `UPDATE tb_estipulante SET ${fields.join(", ")} WHERE id = $${values.length} RETURNING *`;
+    const text = `UPDATE "intermit-benefits".tb_estipulante SET ${fields.join(", ")} WHERE id = $${values.length} RETURNING *`;
     const result = await query(text, values);
 
     return result.rows[0] || null;
   }
 
   async delete(id) {
-    const result = await query(`DELETE FROM tb_estipulante WHERE id = $1 RETURNING id`, [id]);
+    const result = await query(`DELETE FROM "intermit-benefits".tb_estipulante WHERE id = $1 RETURNING id`, [id]);
     return result.rows[0] || null;
   }
 }

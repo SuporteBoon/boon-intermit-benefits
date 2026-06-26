@@ -4,7 +4,7 @@ import { Estipulante } from '../../../classes/estipulante/estipulante.js';
 
 export const handler = async (event) => {
   try {
-    const body = event.body ? JSON.parse(event.body) : {};
+    const body = event
     const service = new Estipulante();
     const item = await service.create(body);
 
