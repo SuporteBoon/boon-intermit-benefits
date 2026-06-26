@@ -1,5 +1,4 @@
-"use strict";
-import { Estipulante } from "../../../classes/estipulante/estipulante.js";
+'use strict';
 
 exports.handler = async (event) => {
   try {
@@ -7,34 +6,33 @@ exports.handler = async (event) => {
     if (!id) {
       return {
         statusCode: 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: "ID do estipulante é obrigatório." }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'ID do estipulante é obrigatório.' })
       };
     }
 
+    const { Estipulante } = require("../../../classes/estipulante/estipulante.js");
     const service = new Estipulante();
     const item = await service.getById(id);
 
     if (!item) {
       return {
         statusCode: 404,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: "Estipulante não encontrado." }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Estipulante não encontrado.' })
       };
     }
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(item),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
     };
   } catch (error) {
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: error.message || "Erro ao buscar estipulante.",
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: error.message || 'Erro ao buscar estipulante.' })
     };
   }
 };

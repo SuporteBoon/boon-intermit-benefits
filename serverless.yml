@@ -103,6 +103,8 @@ functions:
         - "src/handlers/public/estipulante/create.js"
         - "src/classes/estipulante/estipulante.js"
         - "src/infra/database/postgres.js"
+        - "node_modules/**"
+        - "package.json"
 
   getEstipulante:
     handler: src/handlers/public/estipulante/get.handler
@@ -116,6 +118,8 @@ functions:
         - "src/handlers/public/estipulante/get.js"
         - "src/classes/estipulante/estipulante.js"
         - "src/infra/database/postgres.js"
+        - "node_modules/**"
+        - "package.json"
 
   updateEstipulante:
     handler: src/handlers/public/estipulante/update.handler
@@ -129,6 +133,8 @@ functions:
         - "src/handlers/public/estipulante/update.js"
         - "src/classes/estipulante/estipulante.js"
         - "src/infra/database/postgres.js"
+        - "node_modules/**"
+        - "package.json"
 
   deleteEstipulante:
     handler: src/handlers/public/estipulante/delete.handler
@@ -142,3 +148,5 @@ functions:
         - "src/handlers/public/estipulante/delete.js"
         - "src/classes/estipulante/estipulante.js"
         - "src/infra/database/postgres.js"
+        - "node_modules/**"
+        - "package.json"

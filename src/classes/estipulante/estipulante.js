@@ -1,35 +1,37 @@
-import { query } from "../../infra/database/postgres.js";
+'use strict';
+
+const { query } = require('../../infra/database/postgres.js');
 
 const FILLABLE_FIELDS = [
-  "grupo_economico_id",
-  "cnae_id",
-  "estipulante",
-  "razao_social",
-  "cpf_cnpj",
-  "tipo_doc_complementar",
-  "data_fundacao",
-  "cliente_desde",
-  "corretora_id",
-  "estrutura_empresarial",
-  "co_corretor_id",
-  "consultor_id",
-  "gestor_id",
-  "participantes_atend",
-  "classificacao",
-  "status_risco",
-  "notif_atualizacao_atend",
-  "visualizar_dashboard",
-  "enviar_carta_maior_tit",
-  "enviar_carta_maior_est",
-  "codigo_promid",
-  "codigo_apolice_promid",
-  "ativo",
-  "data_cadastro",
-  "data_atualizacao",
-  "usuario_cadastro_id"
+  'grupo_economico_id',
+  'cnae_id',
+  'estipulante',
+  'razao_social',
+  'cpf_cnpj',
+  'tipo_doc_complementar',
+  'data_fundacao',
+  'cliente_desde',
+  'corretora_id',
+  'estrutura_empresarial',
+  'co_corretor_id',
+  'consultor_id',
+  'gestor_id',
+  'participantes_atend',
+  'classificacao',
+  'status_risco',
+  'notif_atualizacao_atend',
+  'visualizar_dashboard',
+  'enviar_carta_maior_tit',
+  'enviar_carta_maior_est',
+  'codigo_promid',
+  'codigo_apolice_promid',
+  'ativo',
+  'data_cadastro',
+  'data_atualizacao',
+  'usuario_cadastro_id'
 ];
 
-export class Estipulante {
+class Estipulante {
   async create(payload) {
     const fields = [];
     const values = [];
@@ -90,3 +92,5 @@ export class Estipulante {
     return result.rows[0] || null;
   }
 }
+
+module.exports.Estipulante = Estipulante;

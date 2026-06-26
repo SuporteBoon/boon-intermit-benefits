@@ -12,7 +12,7 @@ exports.handler = async (event) => {
     }
 
     const body = event.body ? JSON.parse(event.body) : {};
-    const { Estipulante } = await import("../../../classes/estipulante/estipulante.js");
+    const { Estipulante } = require("../../../classes/estipulante/estipulante.js");
     const service = new Estipulante();
     const item = await service.update(id, body);
 

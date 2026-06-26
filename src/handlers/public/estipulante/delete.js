@@ -11,7 +11,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const { Estipulante } = await import("../../../classes/estipulante/estipulante.js");
+    const { Estipulante } = require("../../../classes/estipulante/estipulante.js");
     const service = new Estipulante();
     const item = await service.delete(id);
 
