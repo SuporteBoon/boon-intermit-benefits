@@ -9,7 +9,9 @@ export const handler = async (event) => {
     const requiredFields = [
       'cnpj_empresa',
       'cpf_segurado',
-      'numero_contrato'
+      'numero_contrato',
+      'data_checkin',
+      'nome_evento'
     ];
 
     const missingFields = requiredFields.filter(field => !body[field]);
@@ -29,10 +31,12 @@ export const handler = async (event) => {
     try {
       await client.query('BEGIN');
 
-      // 1. Verificar se o contrato existe
+      // 1. Verificar se o contrato existe (validando também a empresa e o nome do evento associado)
       const resContrato = await client.query(
-        'SELECT id FROM "intermit-benefits".tb_contrato WHERE codigo_contrato_apolice = $1',
-        [body.numero_contrato]
+        `SELECT c.id FROM "intermit-benefits".tb_contrato c
+         JOIN "intermit-benefits".tb_estipulante e ON c.estipulante_id = e.id
+         WHERE c.codigo_contrato_apolice = $1 AND c.produto = $2 AND e.cpf_cnpj = $3`,
+        [body.numero_contrato, body.nome_evento, body.cnpj_empresa]
       );
       if (resContrato.rows.length === 0) {
         await client.query('ROLLBACK');
@@ -100,7 +104,7 @@ export const handler = async (event) => {
       );
 
       // 6. Inserir registro de utilização de cobertura (Check-in)
-      const checkinDate = body.data_checkin ? new Date(body.data_checkin) : new Date();
+      const checkinDate = new Date(body.data_checkin);
       await client.query(
         `INSERT INTO "intermit-benefits".tb_utilizacao_cobertura (
           cobertura_id, contrato_id, check_in, data_criacao
