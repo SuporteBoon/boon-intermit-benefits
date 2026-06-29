@@ -77,17 +77,46 @@ functions:
         - "src/handlers/public/health.js"
 
   newContractWebhook:
-    handler: src/handlers/webhooks/new-contract.handler
+    handler: src/handlers/public/contracts/new-contract.handler
     events:
       - httpApi:
           path: /integration/new-contract
           method: post
-          authorizer:
-            name: cognitoM2M
     package:
       patterns:
         - "!**"
-        - "src/handlers/webhooks/new-contract.js"
+        - "src/handlers/public/contracts/new-contract.js"
+        - "src/infra/database/postgres.js"
+        - "node_modules/**"
+        - "package.json"
+
+  contractCancellation:
+    handler: src/handlers/public/contracts/contract-cancellation.handler
+    events:
+      - httpApi:
+          path: /integration/contract-cancellation
+          method: post
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/public/contracts/contract-cancellation.js"
+        - "src/infra/database/postgres.js"
+        - "node_modules/**"
+        - "package.json"
+
+  checkIn:
+    handler: src/handlers/public/contracts/check-in.handler
+    events:
+      - httpApi:
+          path: /integration/checkin
+          method: post
+    package:
+      patterns:
+        - "!**"
+        - "src/handlers/public/contracts/check-in.js"
+        - "src/infra/database/postgres.js"
+        - "node_modules/**"
+        - "package.json"
 
   createEstipulante:
     handler: src/handlers/public/estipulante/create.handler

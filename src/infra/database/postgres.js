@@ -3,7 +3,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 
 // O Pool deve ser criado fora do handler para ser reutilizado entre execuções da Lambda (Warm Start)
-const pool = new Pool({
+export const pool = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
