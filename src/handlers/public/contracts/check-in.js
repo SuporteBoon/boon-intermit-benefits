@@ -10,8 +10,7 @@ export const handler = async (event) => {
       'cnpj_empresa',
       'cpf_segurado',
       'numero_contrato',
-      'data_checkin',
-      'nome_evento'
+      'data_checkin'
     ];
 
     const missingFields = requiredFields.filter(field => !body[field]);
@@ -35,8 +34,8 @@ export const handler = async (event) => {
       const resContrato = await client.query(
         `SELECT c.id FROM "intermit-benefits".tb_contrato c
          JOIN "intermit-benefits".tb_estipulante e ON c.estipulante_id = e.id
-         WHERE c.codigo_contrato_apolice = $1 AND c.produto = $2 AND e.cpf_cnpj = $3`,
-        [body.numero_contrato, body.nome_evento, body.cnpj_empresa]
+         WHERE c.codigo_contrato_apolice = $1 AND e.cpf_cnpj = $2`,
+        [body.numero_contrato, body.cnpj_empresa]
       );
       if (resContrato.rows.length === 0) {
         await client.query('ROLLBACK');

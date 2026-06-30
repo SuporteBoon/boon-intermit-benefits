@@ -9,6 +9,7 @@ export const handler = async (event) => {
     const requiredFields = [
       'razao_social_empresa',
       'cnpj_empresa',
+      'numero_contrato',
       'nome_evento',
       'data_inicio_contrato',
       'data_fim_contrato',
@@ -98,9 +99,7 @@ export const handler = async (event) => {
       );
       // 2. Contrato (Evento)
       // Código único de apólice derivado
-      const cleanCnpj = body.cnpj_empresa.replace(/\D/g, '');
-      const cleanEventName = body.nome_evento.toLowerCase().replace(/[^a-z0-9]/g, '_');
-      const codigoApolice = `${cleanCnpj}_${cleanEventName}`;
+      const codigoApolice = body.numero_contrato;
 
       let contratoId;
       const resContrato = await client.query(

@@ -9,7 +9,8 @@ export const handler = async (event) => {
     const requiredFields = [
       'cnpj_empresa',
       'cpf_segurado',
-      'numero_contrato'
+      'numero_contrato',
+      'motivo'
     ];
 
     const missingFields = requiredFields.filter(field => !body[field]);
@@ -28,6 +29,7 @@ export const handler = async (event) => {
     // Suportar tanto "data_rescisao" quanto " data_rescisao " com espaços
     const dataRescisaoRaw = body.data_rescisao || body[' data_rescisao '] || body['data_rescisao '] || body[' data_rescisao'];
     const dataRescisao = dataRescisaoRaw ? new Date(dataRescisaoRaw.trim()) : new Date();
+const motivo = body.motivo?.trim();
 
     const client = await pool.connect();
     try {
@@ -95,11 +97,11 @@ export const handler = async (event) => {
 
       // 5. Atualizar Cobertura para CANCELADO e data de fim de cobertura
       await client.query(
-        `UPDATE "intermit-benefits".tb_cobertura_beneficiario
-         SET status = $1, data_fim_cobertura = $2, data_atualizacao = $3
-         WHERE id = $4`,
-        ['CANCELADO', dataRescisao, new Date(), coberturaId]
-      );
+          `UPDATE "intermit-benefits".tb_cobertura_beneficiario
+           SET status = $1, data_fim_cobertura = $2, data_atualizacao = $3, status_reason = $4
+           WHERE id = $5`,
+          ['CANCELADO', dataRescisao, new Date(), motivo, coberturaId]
+        );
 
       // 6. Atualizar Beneficiario para CANCELADO
       await client.query(
