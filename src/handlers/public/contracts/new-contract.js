@@ -14,13 +14,6 @@ export const handler = async (event) => {
       'data_fim_contrato',
       'cpf_segurado',
       'nome_segurado',
-      'logradouro_segurado',
-      'numero_segurado',
-      'complemento_segurado',
-      'bairro_segurado',
-      'cidade_segurado',
-      'uf_segurado',
-      'cep_segurado',
       'celular_segurado',
       'nome_plano',
       'cobertura'
