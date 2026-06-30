@@ -4,7 +4,7 @@ import { pool } from '../../../infra/database/postgres.js';
 
 export const handler = async (event) => {
   try {
-    const body = JSON.parse(event.body || '{}');
+    const body = event
 
     const requiredFields = [
       'cnpj_empresa',

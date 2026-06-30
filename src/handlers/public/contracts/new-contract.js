@@ -4,7 +4,7 @@ import { pool } from '../../../infra/database/postgres.js';
 
 export const handler = async (event) => {
   try {
-    const body = JSON.parse(event.body || '{}');
+    const body = event
 
     const requiredFields = [
       'razao_social_empresa',
@@ -13,7 +13,15 @@ export const handler = async (event) => {
       'data_inicio_contrato',
       'data_fim_contrato',
       'cpf_segurado',
-      'nome_segurado'
+      'nome_segurado',
+      'logradouro_segurado',
+      'numero_segurado',
+      'complemento_segurado',
+      'bairro_segurado',
+      'cidade_segurado',
+      'uf_segurado',
+      'cep_segurado',
+      'celular_segurado'
     ];
 
     const missingFields = requiredFields.filter(field => !body[field]);
@@ -91,15 +99,15 @@ export const handler = async (event) => {
         beneficiarioId = resBeneficiario.rows[0].id;
         await client.query(
           `UPDATE "intermit-benefits".tb_beneficiario
-           SET nome = $1, telefone = $2, status = $3, data_atualizacao = $4
-           WHERE id = $5`,
-          [body.nome_segurado, body.celular_segurado, 'AGUARDANDO_CHECKIN', new Date(), beneficiarioId]
+            SET nome = $1, telefone = $2, logradouro = $3, numero = $4, complemento = $5, bairro = $6, cidade = $7, uf = $8, cep = $9, status = $10, data_atualizacao = $11
+            WHERE id = $12`,
+           [body.nome_segurado, body.celular_segurado, body.logradouro_segurado, body.numero_segurado, body.complemento_segurado, body.bairro_segurado, body.cidade_segurado, body.uf_segurado, body.cep_segurado, 'AGUARDANDO_CHECKIN', new Date(), beneficiarioId]
         );
       } else {
         const insertBeneficiario = await client.query(
-          `INSERT INTO "intermit-benefits".tb_beneficiario (nome, cpf, telefone, status, data_cadastro)
-           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-          [body.nome_segurado, body.cpf_segurado, body.celular_segurado, 'AGUARDANDO_CHECKIN', new Date()]
+          `INSERT INTO "intermit-benefits".tb_beneficiario (nome, cpf, telefone, logradouro, numero, complemento, bairro, cidade, uf, cep, status, data_cadastro)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
+           [body.nome_segurado, body.cpf_segurado, body.celular_segurado, body.logradouro_segurado, body.numero_segurado, body.complemento_segurado, body.bairro_segurado, body.cidade_segurado, body.uf_segurado, body.cep_segurado, 'AGUARDANDO_CHECKIN', new Date()]
         );
         beneficiarioId = insertBeneficiario.rows[0].id;
       }
