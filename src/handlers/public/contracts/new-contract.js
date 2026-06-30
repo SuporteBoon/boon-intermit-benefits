@@ -21,7 +21,9 @@ export const handler = async (event) => {
       'cidade_segurado',
       'uf_segurado',
       'cep_segurado',
-      'celular_segurado'
+      'celular_segurado',
+      'nome_plano',
+      'cobertura'
     ];
 
     const missingFields = requiredFields.filter(field => !body[field]);
@@ -57,7 +59,50 @@ export const handler = async (event) => {
         );
         estipulanteId = insertEstipulante.rows[0].id;
       }
+      // 1.1. Plano
+      let planoId;
+      const resPlano = await client.query(
+        'SELECT id FROM "intermit-benefits".tb_plano WHERE nome = $1',
+        [body.nome_plano]
+      );
+      if (resPlano.rows.length > 0) {
+        planoId = resPlano.rows[0].id;
+      } else {
+        const insertPlano = await client.query(
+          `INSERT INTO "intermit-benefits".tb_plano (nome, ativo, data_cadastro)
+             VALUES ($1, $2, $3) RETURNING id`,
+          [body.nome_plano, true, new Date()]
+        );
+        planoId = insertPlano.rows[0].id;
+      }
 
+      // 1.2. Cobertura
+      let coberturaId;
+      const resCobertura = await client.query(
+        'SELECT id FROM "intermit-benefits".tb_cobertura WHERE nome = $1 AND plano_id = $2',
+        [body.cobertura, planoId]
+      );
+      if (resCobertura.rows.length > 0) {
+        coberturaId = resCobertura.rows[0].id;
+      } else {
+        const insertCobertura = await client.query(
+          `INSERT INTO "intermit-benefits".tb_cobertura (plano_id, nome, descricao, ativo, data_cadastro)
+             VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+          [planoId, body.cobertura, null, true, new Date()]
+        );
+        coberturaId = insertCobertura.rows[0].id;
+      }
+
+      // 1.3. Relacionamento Plano x Cobertura
+      await client.query(
+        `INSERT INTO "intermit-benefits".tb_plano_cobertura (plano_id, cobertura_id)
+           SELECT $1, $2
+           WHERE NOT EXISTS (
+             SELECT 1 FROM "intermit-benefits".tb_plano_cobertura
+             WHERE plano_id = $1 AND cobertura_id = $2
+           )`,
+        [planoId, coberturaId]
+      );
       // 2. Contrato (Evento)
       // Código único de apólice derivado
       const cleanCnpj = body.cnpj_empresa.replace(/\D/g, '');
@@ -74,11 +119,11 @@ export const handler = async (event) => {
       } else {
         const insertContrato = await client.query(
           `INSERT INTO "intermit-benefits".tb_contrato (
-            estipulante_id, produto, codigo_contrato_apolice, data_vigencia_inicio, data_vigencia_final, ativo, data_cadastro
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+            estipulante_id, plano_id, codigo_contrato_apolice, data_vigencia_inicio, data_vigencia_final, ativo, data_cadastro
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
           [
             estipulanteId,
-            body.nome_evento,
+            planoId,
             codigoApolice,
             body.data_inicio_contrato,
             body.data_fim_contrato,
@@ -101,30 +146,30 @@ export const handler = async (event) => {
           `UPDATE "intermit-benefits".tb_beneficiario
             SET nome = $1, telefone = $2, logradouro = $3, numero = $4, complemento = $5, bairro = $6, cidade = $7, uf = $8, cep = $9, status = $10, data_atualizacao = $11
             WHERE id = $12`,
-           [body.nome_segurado, body.celular_segurado, body.logradouro_segurado, body.numero_segurado, body.complemento_segurado, body.bairro_segurado, body.cidade_segurado, body.uf_segurado, body.cep_segurado, 'AGUARDANDO_CHECKIN', new Date(), beneficiarioId]
+          [body.nome_segurado, body.celular_segurado, body.logradouro_segurado, body.numero_segurado, body.complemento_segurado, body.bairro_segurado, body.cidade_segurado, body.uf_segurado, body.cep_segurado, 'AGUARDANDO_CHECKIN', new Date(), beneficiarioId]
         );
       } else {
         const insertBeneficiario = await client.query(
           `INSERT INTO "intermit-benefits".tb_beneficiario (nome, cpf, telefone, logradouro, numero, complemento, bairro, cidade, uf, cep, status, data_cadastro)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
-           [body.nome_segurado, body.cpf_segurado, body.celular_segurado, body.logradouro_segurado, body.numero_segurado, body.complemento_segurado, body.bairro_segurado, body.cidade_segurado, body.uf_segurado, body.cep_segurado, 'AGUARDANDO_CHECKIN', new Date()]
+          [body.nome_segurado, body.cpf_segurado, body.celular_segurado, body.logradouro_segurado, body.numero_segurado, body.complemento_segurado, body.bairro_segurado, body.cidade_segurado, body.uf_segurado, body.cep_segurado, 'AGUARDANDO_CHECKIN', new Date()]
         );
         beneficiarioId = insertBeneficiario.rows[0].id;
       }
 
       // 4. Cobertura Beneficiario (Adesão)
-      let coberturaId;
-      const resCobertura = await client.query(
+      let coberturaBeneficiarioId;
+      const resCoberturaBeneficiario = await client.query(
         'SELECT id FROM "intermit-benefits".tb_cobertura_beneficiario WHERE beneficiario_id = $1 AND contrato_origem_id = $2',
         [beneficiarioId, contratoId]
       );
-      if (resCobertura.rows.length > 0) {
-        coberturaId = resCobertura.rows[0].id;
+      if (resCoberturaBeneficiario.rows.length > 0) {
+        coberturaBeneficiarioId = resCoberturaBeneficiario.rows[0].id;
         await client.query(
           `UPDATE "intermit-benefits".tb_cobertura_beneficiario
            SET data_inicio_cobertura = $1, data_fim_cobertura = $2, status = $3, data_atualizacao = $4
            WHERE id = $5`,
-          [body.data_inicio_contrato, body.data_fim_contrato, 'AGUARDANDO_CHECKIN', new Date(), coberturaId]
+          [body.data_inicio_contrato, body.data_fim_contrato, 'AGUARDANDO_CHECKIN', new Date(), coberturaBeneficiarioId]
         );
       } else {
         const insertCobertura = await client.query(
@@ -140,7 +185,7 @@ export const handler = async (event) => {
             new Date()
           ]
         );
-        coberturaId = insertCobertura.rows[0].id;
+        coberturaBeneficiarioId = insertCobertura.rows[0].id;
       }
 
       await client.query('COMMIT');
